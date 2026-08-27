@@ -196,25 +196,22 @@ function App() {
             />
           </label>
 
-          <label>
+          <label className="money-field">
             Current stock price
             <input
-              type="number"
-              min="0"
-              step="0.01"
+              type="text"
+              inputMode="decimal"
               value={stockPrice}
-              onChange={(event) =>
-                setStockPrice(cleanNumberInput(event.target.value))
-              }
+              readOnly
+              aria-readonly="true"
             />
           </label>
 
-          <label>
+          <label className="money-field">
             Stop-loss price
             <input
-              type="number"
-              min="0"
-              step="0.01"
+              type="text"
+              inputMode="decimal"
               value={stopPrice}
               onChange={(event) =>
                 setStopPrice(cleanNumberInput(event.target.value))
@@ -222,12 +219,11 @@ function App() {
             />
           </label>
 
-          <label>
+          <label className="money-field">
             Current portfolio value
             <input
-              type="number"
-              min="0"
-              step="0.01"
+              type="text"
+              inputMode="decimal"
               value={portfolioValue}
               onChange={(event) =>
                 setPortfolioValue(cleanNumberInput(event.target.value))
