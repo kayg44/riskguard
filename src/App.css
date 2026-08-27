@@ -202,3 +202,42 @@ input:focus {
     border-left: 0;
   }
 }
+.price-button {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #59d89c;
+  border-radius: 9px;
+  color: #07130d;
+  background: #59d89c;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background 160ms ease,
+    transform 160ms ease,
+    opacity 160ms ease;
+}
+
+.price-button:hover:not(:disabled) {
+  background: #72e5af;
+  transform: translateY(-1px);
+}
+
+.price-button:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+.price-error,
+.price-success {
+  margin: -8px 0 0;
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.price-error {
+  color: #ff9292;
+}
+
+.price-success {
+  color: #67e6a9;
+}

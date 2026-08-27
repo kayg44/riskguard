@@ -2,6 +2,13 @@ import { useState } from 'react'
 import './App.css'
 import { assessTrade } from './riskEngine'
 
+type QuoteResponse = {
+  symbol?: string
+  price?: number
+  timestamp?: string | null
+  error?: string
+}
+
 const cleanNumberInput = (value: string) => {
   if (value === '') return '0'
 
@@ -14,6 +21,10 @@ function App() {
   const [stockPrice, setStockPrice] = useState('230')
   const [stopPrice, setStopPrice] = useState('215')
   const [portfolioValue, setPortfolioValue] = useState('100000')
+
+  const [isLoadingPrice, setIsLoadingPrice] = useState(false)
+  const [priceError, setPriceError] = useState('')
+  const [lastUpdated, setLastUpdated] = useState<string | null>(null)
 
   const sharesNumber = Number(shares) || 0
   const stockPriceNumber = Number(stockPrice) || 0
@@ -35,6 +46,40 @@ function App() {
     portfolioValue: portfolioValueNumber,
   })
 
+  async function loadMarketPrice() {
+    if (!symbol.trim()) {
+      setPriceError('Enter a stock symbol first.')
+      return
+    }
+
+    setIsLoadingPrice(true)
+    setPriceError('')
+
+    try {
+      const response = await fetch(
+        `/api/quote?symbol=${encodeURIComponent(symbol)}`,
+      )
+
+      const data = (await response.json()) as QuoteResponse
+
+      if (!response.ok || typeof data.price !== 'number') {
+        throw new Error(data.error ?? 'Unable to load the market price.')
+      }
+
+      setStockPrice(String(data.price))
+      setLastUpdated(data.timestamp ?? new Date().toISOString())
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : 'Unable to load the market price.'
+
+      setPriceError(message)
+    } finally {
+      setIsLoadingPrice(false)
+    }
+  }
+
   return (
     <main>
       <header>
@@ -55,12 +100,31 @@ function App() {
             Stock symbol
             <input
               value={symbol}
-              onChange={(event) =>
+              onChange={(event) => {
                 setSymbol(event.target.value.toUpperCase())
-              }
+                setPriceError('')
+                setLastUpdated(null)
+              }}
               maxLength={5}
             />
           </label>
+
+          <button
+            className="price-button"
+            type="button"
+            onClick={loadMarketPrice}
+            disabled={isLoadingPrice}
+          >
+            {isLoadingPrice ? 'Loading price...' : 'Load market price'}
+          </button>
+
+          {priceError && <p className="price-error">{priceError}</p>}
+
+          {lastUpdated && (
+            <p className="price-success">
+              Latest available IEX trade loaded successfully.
+            </p>
+          )}
 
           <label>
             Number of shares
