@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import './App.css'
+import { assessTrade } from './riskEngine'
 
 const cleanNumberInput = (value: string) => {
   if (value === '') return '0'
@@ -9,33 +10,30 @@ const cleanNumberInput = (value: string) => {
 
 function App() {
   const [symbol, setSymbol] = useState('AAPL')
-  const [shares, setShares] = useState('10')
+  const [shares, setShares] = useState('100')
   const [stockPrice, setStockPrice] = useState('230')
   const [stopPrice, setStopPrice] = useState('215')
-  const [portfolioValue, setPortfolioValue] = useState('10000')
+  const [portfolioValue, setPortfolioValue] = useState('100000')
 
   const sharesNumber = Number(shares) || 0
   const stockPriceNumber = Number(stockPrice) || 0
   const stopPriceNumber = Number(stopPrice) || 0
   const portfolioValueNumber = Number(portfolioValue) || 0
 
-  const positionValue = sharesNumber * stockPriceNumber
-
-  const concentration =
-    portfolioValueNumber > 0
-      ? (positionValue / portfolioValueNumber) * 100
-      : 0
-
-  const maximumLoss = Math.max(
-    0,
-    (stockPriceNumber - stopPriceNumber) * sharesNumber,
-  )
-
-  const concentrationLimit = 25
-  const lossLimit = portfolioValueNumber * 0.02
-
-  const isApproved =
-    concentration <= concentrationLimit && maximumLoss <= lossLimit
+  const {
+    positionValue,
+    concentration,
+    maximumLoss,
+    concentrationLimit,
+    lossLimit,
+    isApproved,
+    warnings,
+  } = assessTrade({
+    shares: sharesNumber,
+    stockPrice: stockPriceNumber,
+    stopPrice: stopPriceNumber,
+    portfolioValue: portfolioValueNumber,
+  })
 
   return (
     <main>
@@ -122,6 +120,18 @@ function App() {
             <strong>{isApproved ? 'APPROVED' : 'REJECTED'}</strong>
           </div>
 
+          {warnings.length > 0 && (
+            <div className="warnings">
+              <h2>Risk warnings</h2>
+
+              <ul>
+                {warnings.map((warning) => (
+                  <li key={warning}>{warning}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           <div className="metric-grid">
             <article>
               <span>Position value</span>
@@ -143,6 +153,7 @@ function App() {
 
           <div className="explanation">
             <h2>{symbol || 'Trade'} analysis</h2>
+
             <p>
               This trade would use {concentration.toFixed(1)}% of the portfolio
               and risk approximately ${maximumLoss.toLocaleString()} at the
