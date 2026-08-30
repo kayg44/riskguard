@@ -151,6 +151,107 @@ header p {
   align-items: stretch;
 }
 
+.workflow-guide {
+  display: grid;
+  grid-template-columns: minmax(250px, 0.72fr) minmax(500px, 1.28fr);
+  gap: 26px;
+  margin-bottom: 22px;
+  padding: 22px 24px;
+  overflow: hidden;
+  border: 1px solid rgb(89 216 156 / 18%);
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 4% 20%, rgb(89 216 156 / 13%), transparent 28%),
+    linear-gradient(120deg, rgb(15 28 34 / 98%), rgb(12 20 28 / 98%));
+  box-shadow:
+    0 20px 55px rgb(0 0 0 / 18%),
+    inset 0 1px 0 rgb(255 255 255 / 3%);
+}
+
+.workflow-intro {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.workflow-intro > span,
+.start-label {
+  flex-shrink: 0;
+  padding: 5px 8px;
+  border: 1px solid rgb(89 216 156 / 25%);
+  border-radius: 999px;
+  color: #67e6a9;
+  background: rgb(89 216 156 / 8%);
+  font-size: 0.61rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.workflow-intro h2 {
+  margin: 0;
+  color: #f6f8fa;
+  font-size: 1.02rem;
+  letter-spacing: -0.02em;
+}
+
+.workflow-intro p {
+  margin: 7px 0 0;
+  color: #8795a2;
+  font-size: 0.75rem;
+  line-height: 1.55;
+}
+
+.workflow-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: workflow;
+}
+
+.workflow-steps li {
+  position: relative;
+  display: grid;
+  align-content: center;
+  gap: 5px;
+  min-height: 76px;
+  padding: 13px 13px 13px 42px;
+  border: 1px solid #26343f;
+  border-radius: 12px;
+  background: rgb(6 13 18 / 48%);
+  counter-increment: workflow;
+}
+
+.workflow-steps li::before {
+  position: absolute;
+  top: 15px;
+  left: 13px;
+  display: grid;
+  width: 21px;
+  height: 21px;
+  place-items: center;
+  border-radius: 6px;
+  color: #06110c;
+  background: #59d89c;
+  content: counter(workflow);
+  font-size: 0.64rem;
+  font-weight: 900;
+}
+
+.workflow-steps strong {
+  color: #e9eef2;
+  font-size: 0.72rem;
+}
+
+.workflow-steps span {
+  color: #778693;
+  font-size: 0.64rem;
+  line-height: 1.45;
+}
+
 .trade-form,
 .results {
   border: 1px solid #202c37;
@@ -218,6 +319,14 @@ label {
   font-weight: 650;
 }
 
+.field-helper {
+  margin-top: -2px;
+  color: #71808e;
+  font-size: 0.68rem;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
 input {
   width: 100%;
   padding: 12px 14px;
@@ -249,8 +358,9 @@ input:focus {
 
 .money-field::after {
   position: absolute;
-  bottom: 13px;
+  top: 42px;
   left: 14px;
+  transform: translateY(-50%);
   color: #71808e;
   content: "$";
   pointer-events: none;
@@ -282,6 +392,148 @@ input[type="number"]::-webkit-outer-spin-button {
   margin: -8px 0 0;
   font-size: 0.74rem;
   line-height: 1.5;
+}
+
+.security-search {
+  position: relative;
+}
+
+.start-label {
+  position: absolute;
+  top: -10px;
+  right: 10px;
+  z-index: 2;
+  box-shadow: 0 7px 20px rgb(0 0 0 / 26%);
+}
+
+.security-search input {
+  border-color: rgb(89 216 156 / 28%);
+  box-shadow: 0 0 0 3px rgb(89 216 156 / 5%);
+}
+
+.suggestion-list {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  left: 0;
+  z-index: 20;
+  max-height: 310px;
+  overflow-y: auto;
+  border: 1px solid #334250;
+  border-radius: 12px;
+  background: rgb(8 15 21 / 98%);
+  box-shadow:
+    0 20px 50px rgb(0 0 0 / 48%),
+    inset 0 1px 0 rgb(255 255 255 / 4%);
+  backdrop-filter: blur(18px);
+}
+
+.suggestion-list button {
+  display: grid;
+  width: 100%;
+  grid-template-columns: 52px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 12px;
+  border: 0;
+  border-bottom: 1px solid #1e2a34;
+  color: #e9eef2;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  transition: background 140ms ease;
+}
+
+.suggestion-list button:last-child {
+  border-bottom: 0;
+}
+
+.suggestion-list button:hover,
+.suggestion-list button:focus-visible {
+  outline: none;
+  background: rgb(89 216 156 / 9%);
+}
+
+.suggestion-list button > strong {
+  color: #67e6a9;
+  font-size: 0.76rem;
+  letter-spacing: 0.04em;
+}
+
+.suggestion-list button > span {
+  overflow: hidden;
+  color: #c8d0d7;
+  font-size: 0.72rem;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.suggestion-list button > small {
+  color: #71808e;
+  font-size: 0.62rem;
+}
+
+.security-profile {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  align-items: center;
+  gap: 11px;
+  margin-top: -5px;
+  padding: 13px;
+  border: 1px solid #293744;
+  border-radius: 12px;
+  background:
+    linear-gradient(135deg, rgb(89 216 156 / 8%), rgb(7 13 19 / 22%));
+}
+
+.security-monogram {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 1px solid rgb(89 216 156 / 28%);
+  border-radius: 11px;
+  color: #67e6a9;
+  background: rgb(89 216 156 / 9%);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+
+.security-identity {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+}
+
+.security-identity strong {
+  overflow: hidden;
+  color: #f2f5f7;
+  font-size: 0.76rem;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.security-identity span {
+  color: #7f8d9a;
+  font-size: 0.66rem;
+}
+
+.security-tags {
+  display: flex;
+  grid-column: 1 / -1;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding-top: 2px;
+}
+
+.security-tags span {
+  padding: 4px 7px;
+  border: 1px solid #2b3946;
+  border-radius: 999px;
+  color: #91a0ad;
+  background: rgb(7 13 19 / 45%);
+  font-size: 0.61rem;
 }
 
 .price-helper {
@@ -362,6 +614,54 @@ input[type="number"]::-webkit-outer-spin-button {
   box-shadow:
     inset 0 0 0 1px rgb(255 93 93 / 8%);
 }
+
+.pending {
+  color: #93a0ac;
+  background: rgb(147 160 172 / 10%);
+  box-shadow:
+    inset 0 0 0 1px rgb(147 160 172 / 9%);
+}
+
+.results-empty {
+  display: grid;
+  min-height: 470px;
+  flex: 1;
+  align-content: center;
+  justify-items: center;
+  gap: 22px;
+  padding: 42px;
+  text-align: center;
+}
+
+.results-empty-mark {
+  display: grid;
+  width: 56px;
+  height: 56px;
+  place-items: center;
+  border: 1px solid rgb(89 216 156 / 24%);
+  border-radius: 16px;
+  color: #67e6a9;
+  background: rgb(89 216 156 / 7%);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  box-shadow: 0 0 38px rgb(89 216 156 / 8%);
+}
+
+.results-empty h2 {
+  margin: 0;
+  color: #f3f6f8;
+  font-size: 1.15rem;
+}
+
+.results-empty p {
+  max-width: 520px;
+  margin: 10px 0 0;
+  color: #7f8d9a;
+  font-size: 0.83rem;
+  line-height: 1.7;
+}
+
 
 .warnings {
   padding: 18px 24px;
@@ -701,9 +1001,14 @@ footer a:hover {
   }
 
   header,
-  .dashboard {
+  .dashboard,
+  .workflow-guide {
     display: grid;
     grid-template-columns: 1fr;
+  }
+
+  .workflow-steps {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .simulation-badge {
@@ -740,6 +1045,18 @@ footer a:hover {
 
   header h1 {
     font-size: 2.8rem;
+  }
+
+  .workflow-guide {
+    padding: 18px;
+  }
+
+  .workflow-intro {
+    flex-direction: column;
+  }
+
+  .workflow-steps {
+    grid-template-columns: 1fr;
   }
 
   .rule-summary {

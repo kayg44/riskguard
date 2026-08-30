@@ -20,10 +20,34 @@ type HistoryResponse = {
   error?: string
 }
 
-const cleanNumberInput = (value: string) => {
-  if (value === '') return '0'
+type SecurityAsset = {
+  id: string
+  symbol: string
+  name: string
+  exchange: string
+  assetClass: string
+  tradable: boolean
+  fractionable: boolean
+  marginable: boolean
+  shortable: boolean
+}
 
-  return value.replace(/^0+(?=\d)/, '')
+type SearchResponse = {
+  assets?: SecurityAsset[]
+  error?: string
+}
+
+const cleanNumberInput = (value: string) => {
+  const cleaned = value.replace(/,/g, '').replace(/[^\d.]/g, '')
+
+  if (cleaned === '') return ''
+
+  const [whole, ...decimalParts] = cleaned.split('.')
+  const normalizedWhole = whole.replace(/^0+(?=\d)/, '')
+
+  return decimalParts.length > 0
+    ? `${normalizedWhole}.${decimalParts.join('')}`
+    : normalizedWhole
 }
 
 const getRiskClass = (usage: number) => {
@@ -43,9 +67,11 @@ const formatCurrency = (value: number) =>
 
 function PriceChart({
   symbol,
+  securityName,
   bars,
 }: {
   symbol: string
+  securityName: string
   bars: PriceBar[]
 }) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
@@ -120,7 +146,7 @@ function PriceChart({
       <div className="chart-heading">
         <div>
           <p className="section-number">04</p>
-          <h2>{symbol} Market History</h2>
+          <h2>{securityName} ({symbol}) market history</h2>
           <p>Latest 30 daily closing prices</p>
         </div>
 
@@ -250,12 +276,11 @@ function PriceChart({
 }
 
 function App() {
-  const [symbol, setSymbol] = useState('AAPL')
-  const [shares, setShares] = useState('100')
-  const [stockPrice, setStockPrice] = useState('230')
-  const [stopPrice, setStopPrice] = useState('215')
-  const [portfolioValue, setPortfolioValue] =
-    useState('100000')
+  const [symbol, setSymbol] = useState('')
+  const [shares, setShares] = useState('')
+  const [stockPrice, setStockPrice] = useState('')
+  const [stopPrice, setStopPrice] = useState('')
+  const [portfolioValue, setPortfolioValue] = useState('100000')
 
   const [isLoadingPrice, setIsLoadingPrice] =
     useState(false)
@@ -272,12 +297,25 @@ function App() {
     useState(false)
 
   const [historyError, setHistoryError] = useState('')
+  const [suggestions, setSuggestions] = useState<SecurityAsset[]>([])
+  const [selectedAsset, setSelectedAsset] = useState<SecurityAsset | null>(null)
+  const [isSearching, setIsSearching] = useState(false)
+  const [showSuggestions, setShowSuggestions] = useState(false)
+  const [searchError, setSearchError] = useState('')
 
   const sharesNumber = Number(shares) || 0
   const stockPriceNumber = Number(stockPrice) || 0
   const stopPriceNumber = Number(stopPrice) || 0
   const portfolioValueNumber =
     Number(portfolioValue) || 0
+
+  const isTradeReady = Boolean(
+    selectedAsset &&
+      sharesNumber > 0 &&
+      stockPriceNumber > 0 &&
+      stopPriceNumber > 0 &&
+      portfolioValueNumber > 0,
+  )
 
   const {
     positionValue,
@@ -315,9 +353,7 @@ function App() {
     : null
 
   useEffect(() => {
-    const normalizedSymbol = symbol
-      .trim()
-      .toUpperCase()
+    const normalizedSymbol = selectedAsset?.symbol ?? ''
 
     if (!/^[A-Z]{1,5}$/.test(normalizedSymbol)) {
       setIsLoadingPrice(false)
@@ -383,12 +419,71 @@ function App() {
       window.clearTimeout(timer)
       controller.abort()
     }
-  }, [symbol])
+  }, [selectedAsset])
 
   useEffect(() => {
-    const normalizedSymbol = symbol
-      .trim()
-      .toUpperCase()
+    const query = symbol.trim()
+
+    if (!query) {
+      setSuggestions([])
+      setSelectedAsset(null)
+      setSearchError('')
+      setIsSearching(false)
+      return
+    }
+
+    const controller = new AbortController()
+
+    const timer = window.setTimeout(async () => {
+      setIsSearching(true)
+      setSearchError('')
+
+      try {
+        const response = await fetch(
+          `/api/search?q=${encodeURIComponent(query)}`,
+          { signal: controller.signal },
+        )
+        const data = (await response.json()) as SearchResponse
+
+        if (!response.ok || !data.assets) {
+          throw new Error(data.error ?? 'Unable to search securities.')
+        }
+
+        setSuggestions(data.assets)
+
+        const exactMatch = data.assets.find(
+          (asset) => asset.symbol === query.toUpperCase(),
+        )
+        setSelectedAsset(exactMatch ?? null)
+      } catch (error) {
+        if (error instanceof DOMException && error.name === 'AbortError') return
+
+        setSuggestions([])
+        setSelectedAsset(null)
+        setSearchError(
+          error instanceof Error ? error.message : 'Unable to search securities.',
+        )
+      } finally {
+        if (!controller.signal.aborted) setIsSearching(false)
+      }
+    }, 300)
+
+    return () => {
+      window.clearTimeout(timer)
+      controller.abort()
+    }
+  }, [symbol])
+
+  const selectAsset = (asset: SecurityAsset) => {
+    setSymbol(asset.symbol)
+    setSelectedAsset(asset)
+    setSuggestions([])
+    setShowSuggestions(false)
+    setSearchError('')
+  }
+
+  useEffect(() => {
+    const normalizedSymbol = selectedAsset?.symbol ?? ''
 
     if (!/^[A-Z]{1,5}$/.test(normalizedSymbol)) {
       setHistory([])
@@ -454,7 +549,7 @@ function App() {
       window.clearTimeout(timer)
       controller.abort()
     }
-  }, [symbol])
+  }, [selectedAsset])
 
   return (
     <main>
@@ -499,6 +594,34 @@ function App() {
 
       </section>
 
+      <section className="workflow-guide" aria-labelledby="workflow-title">
+        <div className="workflow-intro">
+          <span>Start here</span>
+
+          <div>
+            <h2 id="workflow-title">Check a trade in three steps</h2>
+            <p>Enter your idea below. RiskGuard will load the market price and evaluate the risk for you.</p>
+          </div>
+        </div>
+
+        <ol className="workflow-steps">
+          <li>
+            <strong>Find the security</strong>
+            <span>Type a ticker or company name and select it.</span>
+          </li>
+
+          <li>
+            <strong>Enter your trade</strong>
+            <span>Add shares and the price where you would exit.</span>
+          </li>
+
+          <li>
+            <strong>Review the decision</strong>
+            <span>See concentration, estimated loss, and warnings.</span>
+          </li>
+        </ol>
+      </section>
+
       <section className="dashboard">
         <form className="trade-form">
           <div className="section-heading">
@@ -510,28 +633,70 @@ function App() {
             <span>US equities</span>
           </div>
 
-          <label>
-            Ticker Name
+          <div className="security-search">
+            <span className="start-label">Begin here</span>
 
-            <input
-              value={symbol}
-              onChange={(event) => {
-                setSymbol(
-                  event.target.value.toUpperCase(),
-                )
+            <label>
+              Search security
 
-                setPriceError('')
-                setLastUpdated(null)
-              }}
-              maxLength={5}
-            />
-          </label>
+              <input
+                value={symbol}
+                placeholder="Ticker or company name"
+                role="combobox"
+                aria-autocomplete="list"
+                aria-expanded={showSuggestions && suggestions.length > 0}
+                aria-controls="security-suggestions"
+                autoComplete="off"
+                onFocus={() => setShowSuggestions(true)}
+                onBlur={() => {
+                  window.setTimeout(() => setShowSuggestions(false), 150)
+                }}
+                onChange={(event) => {
+                  setSymbol(event.target.value.toUpperCase())
+                  setSelectedAsset(null)
+                  setShowSuggestions(true)
+                  setPriceError('')
+                  setLastUpdated(null)
+                  setStockPrice('')
+                  setHistory([])
+                }}
+                maxLength={40}
+              />
+            </label>
+
+            {showSuggestions && suggestions.length > 0 && (
+              <div
+                id="security-suggestions"
+                className="suggestion-list"
+                role="listbox"
+              >
+                {suggestions.map((asset) => (
+                  <button
+                    key={asset.id || asset.symbol}
+                    type="button"
+                    role="option"
+                    aria-selected={selectedAsset?.symbol === asset.symbol}
+                    onMouseDown={(event) => event.preventDefault()}
+                    onClick={() => selectAsset(asset)}
+                  >
+                    <strong>{asset.symbol}</strong>
+                    <span>{asset.name}</span>
+                    <small>{asset.exchange}</small>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
 
           <p className="price-helper">
-            {isLoadingPrice
+            {isSearching
+              ? 'Searching available US securities...'
+              : isLoadingPrice
               ? 'Loading latest market price...'
-              : 'Price loads automatically after you enter a ticker name.'}
+              : 'Search by ticker or company name, then select a security.'}
           </p>
+
+          {searchError && <p className="price-error">{searchError}</p>}
 
           {priceError && (
             <p className="price-error">
@@ -553,6 +718,30 @@ function App() {
             </div>
           )}
 
+          {selectedAsset && (
+            <div className="security-profile">
+              <div className="security-monogram">
+                {selectedAsset.symbol.slice(0, 2)}
+              </div>
+
+              <div className="security-identity">
+                <strong>{selectedAsset.name}</strong>
+                <span>
+                  {selectedAsset.symbol} · {selectedAsset.exchange}
+                </span>
+              </div>
+
+              <div className="security-tags">
+                <span>{selectedAsset.tradable ? 'Tradable' : 'View only'}</span>
+                <span>
+                  {selectedAsset.fractionable
+                    ? 'Fractional shares'
+                    : 'Whole shares'}
+                </span>
+              </div>
+            </div>
+          )}
+
           <label>
             Number of shares
 
@@ -560,6 +749,7 @@ function App() {
               type="number"
               min="0"
               value={shares}
+              placeholder="Enter number of shares"
               onChange={(event) =>
                 setShares(
                   cleanNumberInput(
@@ -577,6 +767,7 @@ function App() {
               type="text"
               inputMode="decimal"
               value={stockPrice}
+              placeholder="Loads automatically"
               readOnly
               aria-readonly="true"
             />
@@ -589,6 +780,7 @@ function App() {
               type="text"
               inputMode="decimal"
               value={stopPrice}
+              placeholder="Enter your stop-loss price"
               onChange={(event) =>
                 setStopPrice(
                   cleanNumberInput(
@@ -597,6 +789,10 @@ function App() {
                 )
               }
             />
+
+            <small className="field-helper">
+              The price where you plan to exit the trade to limit a potential loss.
+            </small>
           </label>
 
           <label className="money-field">
@@ -606,6 +802,7 @@ function App() {
               type="text"
               inputMode="decimal"
               value={portfolioValue}
+              placeholder="Enter your total portfolio value"
               onChange={(event) =>
                 setPortfolioValue(
                   cleanNumberInput(
@@ -614,6 +811,10 @@ function App() {
                 )
               }
             />
+
+            <small className="field-helper">
+              The current total value of all investments in your portfolio.
+            </small>
           </label>
         </form>
 
@@ -626,17 +827,36 @@ function App() {
 
             <strong
               className={
-                isApproved
+                !isTradeReady
+                  ? 'pending'
+                  : isApproved
                   ? 'approved'
                   : 'rejected'
               }
             >
-              {isApproved
+              {!isTradeReady
+                ? 'WAITING'
+                : isApproved
                 ? 'APPROVED'
                 : 'REJECTED'}
             </strong>
           </div>
 
+          {!isTradeReady ? (
+            <div className="results-empty">
+              <span className="results-empty-mark">RG</span>
+
+              <div>
+                <h2>Enter a proposed trade</h2>
+
+                <p>
+                  Complete the trade form on the left. Your risk decision,
+                  position size, and estimated loss will appear here.
+                </p>
+              </div>
+            </div>
+          ) : (
+            <>
           {warnings.length > 0 && (
             <div className="warnings">
               <h2>Risk warnings</h2>
@@ -722,16 +942,16 @@ function App() {
               </p>
 
               <h2>
-                {symbol || 'Trade'} analysis
+                {selectedAsset
+                  ? `${selectedAsset.name} (${selectedAsset.symbol}) analysis`
+                  : 'Select a security to begin'}
               </h2>
             </div>
 
             <p>
-              This trade would use{' '}
-              {concentration.toFixed(1)}% of the
-              portfolio and risk approximately $
-              {maximumLoss.toLocaleString()} at the
-              selected stop price.
+              {selectedAsset
+                ? `Based on the latest available IEX price for ${selectedAsset.name}, this trade would use ${concentration.toFixed(1)}% of the portfolio and risk approximately $${maximumLoss.toLocaleString()} at the selected stop price.`
+                : 'Search for a ticker or company name and select a security to view its risk analysis.'}
             </p>
           </div>
 
@@ -770,6 +990,8 @@ function App() {
               </strong>
             </div>
           </div>
+            </>
+          )}
         </section>
       </section>
 
@@ -798,6 +1020,7 @@ function App() {
               symbol={symbol
                 .trim()
                 .toUpperCase()}
+              securityName={selectedAsset?.name ?? symbol.trim().toUpperCase()}
               bars={history}
             />
           )}
