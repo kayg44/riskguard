@@ -37,6 +37,16 @@ type SearchResponse = {
   error?: string
 }
 
+type MarketClockResponse = {
+  timestamp?: string
+  isOpen?: boolean
+  nextOpen?: string
+  nextClose?: string
+  error?: string
+}
+
+type Theme = 'dark' | 'light'
+
 const cleanNumberInput = (value: string) => {
   const cleaned = value.replace(/,/g, '').replace(/[^\d.]/g, '')
 
@@ -64,6 +74,15 @@ const formatCurrency = (value: number) =>
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(value)
+
+const formatMarketTime = (value: string) =>
+  new Intl.DateTimeFormat('en-US', {
+    weekday: 'short',
+    hour: 'numeric',
+    minute: '2-digit',
+    timeZone: 'America/New_York',
+    timeZoneName: 'short',
+  }).format(new Date(value))
 
 function PriceChart({
   symbol,
@@ -302,6 +321,17 @@ function App() {
   const [isSearching, setIsSearching] = useState(false)
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [searchError, setSearchError] = useState('')
+  const [theme, setTheme] = useState<Theme>(() => {
+    const savedTheme = window.localStorage.getItem('riskguard-theme')
+
+    if (savedTheme === 'light' || savedTheme === 'dark') return savedTheme
+
+    return window.matchMedia('(prefers-color-scheme: light)').matches
+      ? 'light'
+      : 'dark'
+  })
+  const [marketClock, setMarketClock] = useState<MarketClockResponse | null>(null)
+  const [marketClockError, setMarketClockError] = useState('')
 
   const sharesNumber = Number(shares) || 0
   const stockPriceNumber = Number(stockPrice) || 0
@@ -351,6 +381,54 @@ function App() {
         timeStyle: 'short',
       })
     : null
+
+  const marketStatusText = marketClock?.isOpen
+    ? `Open · Closes ${formatMarketTime(marketClock.nextClose ?? '')}`
+    : marketClock?.nextOpen
+      ? `Closed · Opens ${formatMarketTime(marketClock.nextOpen)}`
+      : 'Checking market...'
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme
+    document.documentElement.style.colorScheme = theme
+    window.localStorage.setItem('riskguard-theme', theme)
+  }, [theme])
+
+  useEffect(() => {
+    let isActive = true
+
+    const loadMarketClock = async () => {
+      try {
+        const response = await fetch('/api/clock')
+        const data = (await response.json()) as MarketClockResponse
+
+        if (!response.ok || typeof data.isOpen !== 'boolean') {
+          throw new Error(data.error ?? 'Unable to load market status.')
+        }
+
+        if (isActive) {
+          setMarketClock(data)
+          setMarketClockError('')
+        }
+      } catch (error) {
+        if (isActive) {
+          setMarketClockError(
+            error instanceof Error
+              ? error.message
+              : 'Unable to load market status.',
+          )
+        }
+      }
+    }
+
+    void loadMarketClock()
+    const timer = window.setInterval(loadMarketClock, 60_000)
+
+    return () => {
+      isActive = false
+      window.clearInterval(timer)
+    }
+  }, [])
 
   useEffect(() => {
     const normalizedSymbol = selectedAsset?.symbol ?? ''
@@ -571,10 +649,31 @@ function App() {
           </div>
         </div>
 
-        <span className="simulation-badge">
-          <span className="status-dot" />
-          Simulation only
-        </span>
+        <div className="header-actions">
+          <div
+            className={`market-clock ${marketClock?.isOpen ? 'market-open' : 'market-closed'}`}
+            title={marketClockError || 'Official US equity market status from Alpaca'}
+            aria-live="polite"
+          >
+            <span className="status-dot" />
+
+            <div>
+              <strong>US market</strong>
+              <span>{marketClockError ? 'Status unavailable' : marketStatusText}</span>
+            </div>
+          </div>
+
+          <button
+            className="theme-toggle"
+            type="button"
+            onClick={() => setTheme((current) => (current === 'dark' ? 'light' : 'dark'))}
+            aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
+            title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
+          >
+            <span aria-hidden="true">{theme === 'dark' ? '☀' : '☾'}</span>
+            {theme === 'dark' ? 'Light' : 'Dark'}
+          </button>
+        </div>
       </header>
 
       <section
