@@ -20,6 +20,38 @@ type HistoryResponse = {
   error?: string
 }
 
+type ChartRange = '1D' | '1W' | '1M' | '3M' | '6M' | 'YTD'
+
+const chartRangeDetails: Record<
+  ChartRange,
+  { description: string; accessibleLabel: string }
+> = {
+  '1D': {
+    description: '5-minute prices from the latest trading session',
+    accessibleLabel: 'one day',
+  },
+  '1W': {
+    description: 'Hourly prices across the latest five trading days',
+    accessibleLabel: 'one week',
+  },
+  '1M': {
+    description: 'Daily closing prices across the latest month',
+    accessibleLabel: 'one month',
+  },
+  '3M': {
+    description: 'Daily closing prices across the latest three months',
+    accessibleLabel: 'three months',
+  },
+  '6M': {
+    description: 'Daily closing prices across the latest six months',
+    accessibleLabel: 'six months',
+  },
+  YTD: {
+    description: 'Daily closing prices since the start of the year',
+    accessibleLabel: 'year to date',
+  },
+}
+
 type SecurityAsset = {
   id: string
   symbol: string
@@ -46,6 +78,7 @@ type MarketClockResponse = {
 }
 
 type Theme = 'dark' | 'light'
+type ThemePreference = Theme | 'system'
 
 const cleanNumberInput = (value: string) => {
   const cleaned = value.replace(/,/g, '').replace(/[^\d.]/g, '')
@@ -88,22 +121,26 @@ function PriceChart({
   symbol,
   securityName,
   bars,
+  range,
+  onRangeChange,
 }: {
   symbol: string
   securityName: string
   bars: PriceBar[]
+  range: ChartRange
+  onRangeChange: (range: ChartRange) => void
 }) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
 
   const width = 900
   const height = 260
-  const paddingX = 22
-  const paddingY = 20
+  const paddingX = 38
+  const paddingY = 24
 
   const prices = bars.map((bar) => bar.close)
   const minimumPrice = Math.min(...prices)
   const maximumPrice = Math.max(...prices)
-  const range = maximumPrice - minimumPrice || 1
+  const priceRange = maximumPrice - minimumPrice || 1
 
   const points = bars.map((bar, index) => ({
     ...bar,
@@ -113,7 +150,7 @@ function PriceChart({
         (width - paddingX * 2),
     y:
       paddingY +
-      ((maximumPrice - bar.close) / range) *
+      ((maximumPrice - bar.close) / priceRange) *
         (height - paddingY * 2),
   }))
 
@@ -138,6 +175,15 @@ function PriceChart({
 
   const activePoint =
     activeIndex === null ? null : points[activeIndex]
+
+  const formatPointDate = (value: string) =>
+    new Date(value).toLocaleString([], {
+      month: 'short',
+      day: 'numeric',
+      ...(range === '1D' || range === '1W'
+        ? { hour: 'numeric', minute: '2-digit' }
+        : { year: 'numeric' }),
+    })
 
   const updateActivePoint = (
     event: PointerEvent<SVGSVGElement>,
@@ -166,20 +212,42 @@ function PriceChart({
         <div>
           <p className="section-number">04</p>
           <h2>{securityName} ({symbol}) market history</h2>
-          <p>Latest 30 daily closing prices</p>
+          <p>{chartRangeDetails[range].description}</p>
         </div>
 
-        <div className="chart-summary">
-          <strong>
-            {formatCurrency(activePoint?.close ?? latestPrice)}
-          </strong>
-
-          <span
-            className={isPositive ? 'safe-text' : 'danger-text'}
+        <div className="chart-controls">
+          <div
+            className="chart-range"
+            role="group"
+            aria-label="Chart time range"
           >
-            {percentageChange >= 0 ? '+' : ''}
-            {percentageChange.toFixed(2)}% this period
-          </span>
+            {(['1D', '1W', '1M', '3M', '6M', 'YTD'] as ChartRange[]).map(
+              (option) => (
+                <button
+                  key={option}
+                  type="button"
+                  className={range === option ? 'active' : ''}
+                  aria-pressed={range === option}
+                  onClick={() => onRangeChange(option)}
+                >
+                  {option}
+                </button>
+              ),
+            )}
+          </div>
+
+          <div className="chart-summary">
+            <strong>
+              {formatCurrency(activePoint?.close ?? latestPrice)}
+            </strong>
+
+            <span
+              className={isPositive ? 'safe-text' : 'danger-text'}
+            >
+              {percentageChange >= 0 ? '+' : ''}
+              {percentageChange.toFixed(2)}% this period
+            </span>
+          </div>
         </div>
       </div>
 
@@ -188,7 +256,7 @@ function PriceChart({
           className="price-chart"
           viewBox={`0 0 ${width} ${height}`}
           role="img"
-          aria-label={`${symbol} 30-day closing-price chart`}
+          aria-label={`${symbol} ${chartRangeDetails[range].accessibleLabel} price chart`}
           onPointerMove={updateActivePoint}
           onPointerLeave={() => setActiveIndex(null)}
         >
@@ -251,7 +319,13 @@ function PriceChart({
 
         {activePoint && (
           <div
-            className="chart-tooltip"
+            className={`chart-tooltip ${
+              activeIndex === 0
+                ? 'chart-tooltip-start'
+                : activeIndex === points.length - 1
+                  ? 'chart-tooltip-end'
+                  : ''
+            }`}
             style={{
               left: `${(activePoint.x / width) * 100}%`,
             }}
@@ -260,15 +334,7 @@ function PriceChart({
               {formatCurrency(activePoint.close)}
             </strong>
 
-            <span>
-              {new Date(
-                activePoint.date,
-              ).toLocaleDateString([], {
-                month: 'short',
-                day: 'numeric',
-                year: 'numeric',
-              })}
-            </span>
+            <span>{formatPointDate(activePoint.date)}</span>
           </div>
         )}
       </div>
@@ -311,6 +377,8 @@ function App() {
   >(null)
 
   const [history, setHistory] = useState<PriceBar[]>([])
+  const [historyRange, setHistoryRange] =
+    useState<ChartRange>('1M')
 
   const [isLoadingHistory, setIsLoadingHistory] =
     useState(false)
@@ -321,15 +389,29 @@ function App() {
   const [isSearching, setIsSearching] = useState(false)
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [searchError, setSearchError] = useState('')
-  const [theme, setTheme] = useState<Theme>(() => {
-    const savedTheme = window.localStorage.getItem('riskguard-theme')
+  const [themePreference, setThemePreference] =
+    useState<ThemePreference>(() => {
+      const savedTheme = window.localStorage.getItem('riskguard-theme')
 
-    if (savedTheme === 'light' || savedTheme === 'dark') return savedTheme
+      if (
+        savedTheme === 'light' ||
+        savedTheme === 'dark' ||
+        savedTheme === 'system'
+      ) {
+        return savedTheme
+      }
 
-    return window.matchMedia('(prefers-color-scheme: light)').matches
+      return 'system'
+    })
+
+  const [systemTheme, setSystemTheme] = useState<Theme>(() =>
+    window.matchMedia('(prefers-color-scheme: light)').matches
       ? 'light'
-      : 'dark'
-  })
+      : 'dark',
+  )
+
+  const resolvedTheme =
+    themePreference === 'system' ? systemTheme : themePreference
   const [marketClock, setMarketClock] = useState<MarketClockResponse | null>(null)
   const [marketClockError, setMarketClockError] = useState('')
 
@@ -389,10 +471,26 @@ function App() {
       : 'Checking market...'
 
   useEffect(() => {
-    document.documentElement.dataset.theme = theme
-    document.documentElement.style.colorScheme = theme
-    window.localStorage.setItem('riskguard-theme', theme)
-  }, [theme])
+    const mediaQuery = window.matchMedia(
+      '(prefers-color-scheme: light)',
+    )
+
+    const updateSystemTheme = (event: MediaQueryListEvent) => {
+      setSystemTheme(event.matches ? 'light' : 'dark')
+    }
+
+    mediaQuery.addEventListener('change', updateSystemTheme)
+
+    return () => {
+      mediaQuery.removeEventListener('change', updateSystemTheme)
+    }
+  }, [])
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = resolvedTheme
+    document.documentElement.style.colorScheme = resolvedTheme
+    window.localStorage.setItem('riskguard-theme', themePreference)
+  }, [resolvedTheme, themePreference])
 
   useEffect(() => {
     let isActive = true
@@ -580,7 +678,7 @@ function App() {
         const response = await fetch(
           `/api/history?symbol=${encodeURIComponent(
             normalizedSymbol,
-          )}`,
+          )}&range=${historyRange}`,
           {
             signal: controller.signal,
           },
@@ -627,7 +725,7 @@ function App() {
       window.clearTimeout(timer)
       controller.abort()
     }
-  }, [selectedAsset])
+  }, [selectedAsset, historyRange])
 
   return (
     <main>
@@ -642,9 +740,10 @@ function App() {
 
             <h1>RiskGuard</h1>
 
-            <p>
-              Evaluate a stock trade before adding it to
-              your portfolio.
+            <p className="brand-statement">Know the downside before you buy.</p>
+
+            <p className="brand-description">
+              A clearer way to evaluate position risk before a trade enters your portfolio.
             </p>
           </div>
         </div>
@@ -663,16 +762,27 @@ function App() {
             </div>
           </div>
 
-          <button
-            className="theme-toggle"
-            type="button"
-            onClick={() => setTheme((current) => (current === 'dark' ? 'light' : 'dark'))}
-            aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
-            title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
+          <div
+            className="theme-switcher"
+            role="group"
+            aria-label="Color theme"
           >
-            <span aria-hidden="true">{theme === 'dark' ? '☀' : '☾'}</span>
-            {theme === 'dark' ? 'Light' : 'Dark'}
-          </button>
+            {(['system', 'light', 'dark'] as ThemePreference[]).map(
+              (option) => (
+                <button
+                  key={option}
+                  type="button"
+                  className={themePreference === option ? 'active' : ''}
+                  aria-pressed={themePreference === option}
+                  onClick={() => setThemePreference(option)}
+                >
+                  {option === 'system'
+                    ? 'System'
+                    : option[0].toUpperCase() + option.slice(1)}
+                </button>
+              ),
+            )}
+          </div>
         </div>
       </header>
 
@@ -1121,6 +1231,8 @@ function App() {
                 .toUpperCase()}
               securityName={selectedAsset?.name ?? symbol.trim().toUpperCase()}
               bars={history}
+              range={historyRange}
+              onRangeChange={setHistoryRange}
             />
           )}
       </section>

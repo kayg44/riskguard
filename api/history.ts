@@ -14,6 +14,20 @@ type AlpacaBarsResponse = {
   message?: string
 }
 
+type HistoryRange = '1D' | '1W' | '1M' | '3M' | '6M' | 'YTD'
+
+const rangeSettings: Record<
+  HistoryRange,
+  { timeframe: string; lookbackDays: number }
+> = {
+  '1D': { timeframe: '5Min', lookbackDays: 7 },
+  '1W': { timeframe: '1Hour', lookbackDays: 12 },
+  '1M': { timeframe: '1Day', lookbackDays: 45 },
+  '3M': { timeframe: '1Day', lookbackDays: 105 },
+  '6M': { timeframe: '1Day', lookbackDays: 200 },
+  YTD: { timeframe: '1Day', lookbackDays: 370 },
+}
+
 export default {
   async fetch(request: Request) {
     if (request.method !== 'GET') {
@@ -29,9 +43,20 @@ export default {
       .trim()
       .toUpperCase()
 
+    const range = (
+      requestUrl.searchParams.get('range') ?? '1M'
+    ).toUpperCase() as HistoryRange
+
     if (!validSymbol.test(symbol)) {
       return Response.json(
         { error: 'Enter a valid stock symbol.' },
+        { status: 400 },
+      )
+    }
+
+    if (!(range in rangeSettings)) {
+      return Response.json(
+        { error: 'Choose a valid chart range.' },
         { status: 400 },
       )
     }
@@ -47,12 +72,20 @@ export default {
     }
 
     const startDate = new Date()
-    startDate.setUTCDate(startDate.getUTCDate() - 60)
+
+    if (range === 'YTD') {
+      startDate.setUTCMonth(0, 1)
+      startDate.setUTCHours(0, 0, 0, 0)
+    } else {
+      startDate.setUTCDate(
+        startDate.getUTCDate() - rangeSettings[range].lookbackDays,
+      )
+    }
 
     const params = new URLSearchParams({
-      timeframe: '1Day',
+      timeframe: rangeSettings[range].timeframe,
       start: startDate.toISOString(),
-      limit: '60',
+      limit: '1000',
       adjustment: 'raw',
       feed: 'iex',
       sort: 'asc',
@@ -82,16 +115,49 @@ export default {
         )
       }
 
-      const bars = (data.bars ?? [])
+      const normalizedBars = (data.bars ?? [])
         .filter(
           (bar): bar is Required<Pick<AlpacaBar, 'c' | 't'>> =>
             typeof bar.c === 'number' && typeof bar.t === 'string',
         )
-        .slice(-30)
         .map((bar) => ({
           date: bar.t,
           close: bar.c,
         }))
+
+      let bars = normalizedBars
+
+      if (range === '1D' && normalizedBars.length > 0) {
+        const latestTradingDate = normalizedBars.at(-1)?.date.slice(0, 10)
+        bars = normalizedBars.filter(
+          (bar) => bar.date.slice(0, 10) === latestTradingDate,
+        )
+      }
+
+      if (range === '1W') {
+        const latestTradingDates = new Set(
+          normalizedBars
+            .map((bar) => bar.date.slice(0, 10))
+            .filter((date, index, dates) => dates.indexOf(date) === index)
+            .slice(-5),
+        )
+
+        bars = normalizedBars.filter((bar) =>
+          latestTradingDates.has(bar.date.slice(0, 10)),
+        )
+      }
+
+      if (range === '1M') {
+        bars = normalizedBars.slice(-22)
+      }
+
+      if (range === '3M') {
+        bars = normalizedBars.slice(-66)
+      }
+
+      if (range === '6M') {
+        bars = normalizedBars.slice(-132)
+      }
 
       if (bars.length < 2) {
         return Response.json(
@@ -106,7 +172,12 @@ export default {
 
       return Response.json({
         symbol,
+        range,
         bars,
+      }, {
+        headers: {
+          'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+        },
       })
     } catch {
       return Response.json(

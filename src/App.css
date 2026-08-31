@@ -941,6 +941,47 @@ input[type="number"]::-webkit-outer-spin-button {
   gap: 5px;
 }
 
+.chart-controls {
+  display: grid;
+  justify-items: end;
+  gap: 14px;
+}
+
+.chart-range {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid #292929;
+  border-radius: 8px;
+  background: #050505;
+}
+
+.chart-range button {
+  min-width: 44px;
+  padding: 7px 10px;
+  border: 0;
+  border-radius: 5px;
+  color: #b8b8b3;
+  background: transparent;
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.chart-range button:hover,
+.chart-range button:focus-visible {
+  color: #ffffff;
+  background: #171717;
+}
+
+.chart-range button.active {
+  color: #090909;
+  background: #e1c45c;
+}
+
 .chart-summary > strong {
   color: #ffffff;
   font-size: 1.35rem;
@@ -1014,6 +1055,14 @@ input[type="number"]::-webkit-outer-spin-button {
   transform: translateX(-50%);
 }
 
+.chart-tooltip-start {
+  transform: translateX(0);
+}
+
+.chart-tooltip-end {
+  transform: translateX(-100%);
+}
+
 .chart-tooltip strong {
   font-size: 0.78rem;
 }
@@ -1079,6 +1128,300 @@ footer a {
 
 footer a:hover {
   color: #67e6a9;
+}
+
+/* Editorial fintech direction */
+
+body {
+  background:
+    radial-gradient(circle at 82% 4%, rgb(200 166 58 / 16%), transparent 30%),
+    radial-gradient(circle at 2% 46%, rgb(68 37 232 / 10%), transparent 27%),
+    #050816;
+}
+
+main {
+  width: min(1240px, calc(100% - 48px));
+  padding-top: 58px;
+}
+
+header {
+  align-items: center;
+  margin-bottom: 38px;
+}
+
+.brand {
+  gap: 16px;
+}
+
+.brand-mark {
+  width: 42px;
+  height: 42px;
+  border-color: rgb(214 184 74 / 55%);
+  border-radius: 8px;
+  color: #ffffff;
+  background: #c8a63a;
+  box-shadow: 0 12px 32px rgb(200 166 58 / 22%);
+}
+
+header h1 {
+  margin: 2px 0 11px;
+  font-size: clamp(3rem, 5.5vw, 4.8rem);
+  font-weight: 700;
+  letter-spacing: -0.065em;
+}
+
+header .brand-statement {
+  color: #d9deec;
+  font-size: 1rem;
+  font-weight: 650;
+  letter-spacing: -0.015em;
+}
+
+header .brand-description {
+  max-width: 570px;
+  margin-top: 7px;
+  color: #818aa2;
+  font-size: 0.78rem;
+  line-height: 1.55;
+}
+
+.eyebrow,
+.project-note > span,
+.section-number,
+.explanation .section-number {
+  color: #d5b64a;
+}
+
+.project-note {
+  padding: 14px 0;
+  border: 0;
+  border-top: 1px solid #1b2544;
+  border-bottom: 1px solid #1b2544;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.workflow-guide {
+  gap: 34px;
+  padding: 21px 22px;
+  border-color: #263667;
+  border-radius: 10px;
+  background:
+    linear-gradient(90deg, rgb(200 166 58 / 18%), transparent 32%),
+    #0a1025;
+  box-shadow: none;
+}
+
+.workflow-intro > span,
+.start-label {
+  border-color: rgb(224 195 91 / 42%);
+  border-radius: 5px;
+  color: #e7cd69;
+  background: rgb(200 166 58 / 14%);
+}
+
+.workflow-steps {
+  gap: 8px;
+}
+
+.workflow-steps li {
+  min-height: 72px;
+  border-color: #202d55;
+  border-radius: 7px;
+  background: rgb(6 10 27 / 58%);
+}
+
+.workflow-steps li::before {
+  border-radius: 4px;
+  color: #ffffff;
+  background: #c8a63a;
+}
+
+.dashboard {
+  grid-template-columns: minmax(320px, 0.7fr) minmax(520px, 1.5fr);
+  gap: 14px;
+}
+
+.trade-form,
+.results,
+.chart-card,
+.chart-state {
+  border-color: #1c294e;
+  border-radius: 10px;
+  background: #0a1022;
+  box-shadow: 0 18px 55px rgb(0 0 0 / 20%);
+}
+
+.trade-form {
+  padding: 24px;
+}
+
+.decision-header,
+.metric-grid,
+.rule-summary,
+.rule-summary > div + div,
+.metric-grid article + article {
+  border-color: #1c294e;
+}
+
+.rule-summary {
+  background: #070c1b;
+}
+
+.section-heading > span,
+.security-tags span {
+  border-color: #25345f;
+  border-radius: 4px;
+  color: #7f89a3;
+  background: transparent;
+}
+
+label {
+  color: #a7afc2;
+}
+
+input {
+  border-color: #27365e;
+  border-radius: 6px;
+  background: #070c19;
+}
+
+input:hover {
+  border-color: #3c4e82;
+}
+
+input:focus {
+  border-color: #d6b84a;
+  border-radius: 6px;
+  background: #080e20;
+  box-shadow: 0 0 0 3px rgb(200 166 58 / 14%);
+}
+
+.security-search input {
+  border-color: rgb(214 184 74 / 62%);
+  box-shadow: none;
+}
+
+.suggestion-list {
+  border-color: #324372;
+  border-radius: 7px;
+  background: #090f21;
+  box-shadow: 0 22px 55px rgb(0 0 0 / 46%);
+}
+
+.suggestion-list button {
+  border-color: #1c294e;
+}
+
+.suggestion-list button:hover,
+.suggestion-list button:focus-visible {
+  background: rgb(200 166 58 / 12%);
+}
+
+.suggestion-list button > strong {
+  color: #e1c45c;
+}
+
+.security-profile {
+  border-color: #263663;
+  border-radius: 7px;
+  background: #0d1630;
+}
+
+.security-monogram,
+.results-empty-mark {
+  border-color: rgb(214 184 74 / 42%);
+  border-radius: 7px;
+  color: #f0d77a;
+  background: rgb(200 166 58 / 14%);
+  box-shadow: none;
+}
+
+.market-status {
+  border-color: rgb(200 166 58 / 28%);
+  border-radius: 6px;
+  background: rgb(200 166 58 / 8%);
+}
+
+.market-status strong,
+.money-field input:read-only {
+  color: #e7cd69;
+}
+
+.money-field input:read-only {
+  border-color: rgb(214 184 74 / 35%);
+  background: rgb(200 166 58 / 6%);
+}
+
+.market-clock,
+.theme-toggle {
+  border-color: #27365e;
+  border-radius: 7px;
+  background: #090f20;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.theme-toggle:hover {
+  border-color: #d6b84a;
+  color: #e7cd69;
+}
+
+.theme-toggle:focus-visible {
+  outline-color: rgb(200 166 58 / 24%);
+}
+
+.decision-header > strong {
+  border-radius: 4px;
+}
+
+.metric-grid strong,
+.chart-summary > strong,
+.money-field input {
+  font-variant-numeric: tabular-nums;
+}
+
+.risk-track {
+  height: 3px;
+  background: #202b49;
+}
+
+.chart-card {
+  color: #d6b84a;
+}
+
+.chart-card.chart-negative {
+  color: #ff6f7d;
+}
+
+.chart-grid-line {
+  stroke: #1e2a4b;
+}
+
+.chart-line {
+  stroke-width: 2.5;
+  filter: drop-shadow(0 0 5px currentColor);
+}
+
+.chart-point {
+  fill: #0a1022;
+}
+
+.chart-tooltip {
+  border-color: #334470;
+  border-radius: 6px;
+  background: #080e1e;
+}
+
+.safe-text,
+.approved {
+  color: #35c985;
+}
+
+footer a:hover {
+  color: #e1c45c;
 }
 
 html[data-theme="light"] {
@@ -1264,6 +1607,619 @@ html[data-theme="light"] footer a {
   color: #65776e;
 }
 
+html[data-theme="light"] {
+  color: #17213a;
+  background: #f4f5f8;
+}
+
+html[data-theme="light"] body {
+  background:
+    radial-gradient(circle at 86% 2%, rgb(200 166 58 / 10%), transparent 30%),
+    #f4f5f8;
+}
+
+html[data-theme="light"] header h1,
+html[data-theme="light"] .section-heading h2,
+html[data-theme="light"] .explanation h2,
+html[data-theme="light"] .metric-grid strong,
+html[data-theme="light"] .chart-heading h2,
+html[data-theme="light"] .chart-summary > strong,
+html[data-theme="light"] .results-empty h2,
+html[data-theme="light"] .workflow-intro h2 {
+  color: #10182c;
+}
+
+html[data-theme="light"] header .brand-statement {
+  color: #222d48;
+}
+
+html[data-theme="light"] header .brand-description,
+html[data-theme="light"] .project-note p,
+html[data-theme="light"] .workflow-intro p,
+html[data-theme="light"] .explanation p,
+html[data-theme="light"] .results-empty p {
+  color: #667087;
+}
+
+html[data-theme="light"] .eyebrow,
+html[data-theme="light"] .project-note > span,
+html[data-theme="light"] .section-number,
+html[data-theme="light"] .explanation .section-number {
+  color: #c8a63a;
+}
+
+html[data-theme="light"] .project-note {
+  border-color: #d9deea;
+  background: transparent;
+  box-shadow: none;
+}
+
+html[data-theme="light"] .trade-form,
+html[data-theme="light"] .results,
+html[data-theme="light"] .chart-card,
+html[data-theme="light"] .chart-state {
+  border-color: #d9deea;
+  background: #ffffff;
+  box-shadow: 0 18px 48px rgb(28 42 80 / 7%);
+}
+
+html[data-theme="light"] .workflow-guide {
+  border-color: #cbd5ff;
+  background:
+    linear-gradient(90deg, rgb(200 166 58 / 10%), transparent 35%),
+    #ffffff;
+  box-shadow: none;
+}
+
+html[data-theme="light"] .workflow-intro > span,
+html[data-theme="light"] .start-label {
+  border-color: #dfcf9a;
+  color: #80610f;
+  background: #fbf7ea;
+}
+
+html[data-theme="light"] .workflow-steps li,
+html[data-theme="light"] .security-profile {
+  border-color: #d9deea;
+  background: #f8f9fc;
+}
+
+html[data-theme="light"] .workflow-steps li::before {
+  color: #ffffff;
+  background: #c8a63a;
+}
+
+html[data-theme="light"] .workflow-steps strong,
+html[data-theme="light"] .security-identity strong,
+html[data-theme="light"] .market-clock strong {
+  color: #202a43;
+}
+
+html[data-theme="light"] label {
+  color: #4e5972;
+}
+
+html[data-theme="light"] input {
+  border-color: #cfd6e5;
+  color: #18223a;
+  background: #ffffff;
+}
+
+html[data-theme="light"] input:hover {
+  border-color: #9caddd;
+}
+
+html[data-theme="light"] input:focus {
+  border-color: #c8a63a;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgb(200 166 58 / 12%);
+}
+
+html[data-theme="light"] .security-search input {
+  border-color: #e1c45c;
+}
+
+html[data-theme="light"] .money-field input:read-only,
+html[data-theme="light"] .market-status {
+  border-color: #dfcf9a;
+  color: #80610f;
+  background: #fbf7ea;
+}
+
+html[data-theme="light"] .market-status strong,
+html[data-theme="light"] .money-field input:read-only {
+  color: #80610f;
+}
+
+html[data-theme="light"] .decision-header,
+html[data-theme="light"] .metric-grid,
+html[data-theme="light"] .rule-summary,
+html[data-theme="light"] .rule-summary > div + div,
+html[data-theme="light"] .metric-grid article + article {
+  border-color: #e0e4ed;
+}
+
+html[data-theme="light"] .rule-summary {
+  background: #f7f8fb;
+}
+
+html[data-theme="light"] .market-clock,
+html[data-theme="light"] .theme-toggle {
+  border-color: #d2d8e5;
+  color: #4d5870;
+  background: #ffffff;
+  box-shadow: none;
+}
+
+html[data-theme="light"] .theme-toggle:hover {
+  border-color: #c8a63a;
+  color: #80610f;
+}
+
+html[data-theme="light"] .suggestion-list {
+  border-color: #cfd6e5;
+  background: #ffffff;
+  box-shadow: 0 20px 50px rgb(28 42 80 / 16%);
+}
+
+html[data-theme="light"] .suggestion-list button:hover,
+html[data-theme="light"] .suggestion-list button:focus-visible {
+  background: #f0f3ff;
+}
+
+html[data-theme="light"] .suggestion-list button > strong {
+  color: #80610f;
+}
+
+html[data-theme="light"] .security-monogram,
+html[data-theme="light"] .results-empty-mark {
+  border-color: #c3ceff;
+  color: #80610f;
+  background: #fbf7ea;
+}
+
+html[data-theme="light"] .chart-card {
+  color: #c8a63a;
+}
+
+html[data-theme="light"] .chart-grid-line {
+  stroke: #e2e6ef;
+}
+
+/* High-clarity typography */
+
+header .brand-description {
+  color: #aeb8cf;
+  font-size: 0.86rem;
+}
+
+.project-note p {
+  color: #bdc6d9;
+  font-size: 0.82rem;
+}
+
+.workflow-intro p {
+  color: #b3bdd2;
+  font-size: 0.8rem;
+}
+
+.workflow-steps strong {
+  color: #f5f7ff;
+  font-size: 0.78rem;
+}
+
+.workflow-steps span {
+  color: #aab4ca;
+  font-size: 0.71rem;
+}
+
+label {
+  color: #d0d7e6;
+  font-size: 0.82rem;
+}
+
+.field-helper,
+.price-helper {
+  color: #a1acc2;
+  font-size: 0.73rem;
+}
+
+input {
+  font-size: 0.84rem;
+}
+
+.market-clock strong {
+  color: #f4f6fb;
+  font-size: 0.72rem;
+}
+
+.market-clock > div > span {
+  color: #adb7cb;
+  font-size: 0.66rem;
+}
+
+.theme-toggle {
+  color: #d0d7e6;
+  font-size: 0.73rem;
+}
+
+.section-heading > span,
+.security-tags span {
+  color: #aeb8cc;
+  font-size: 0.68rem;
+}
+
+.security-identity strong {
+  color: #f5f7ff;
+  font-size: 0.8rem;
+}
+
+.security-identity span,
+.suggestion-list button > small {
+  color: #a6b0c5;
+  font-size: 0.69rem;
+}
+
+.suggestion-list button > span {
+  color: #d3d9e7;
+  font-size: 0.76rem;
+}
+
+.market-status small {
+  color: #a7b1c6;
+  font-size: 0.71rem;
+}
+
+.decision-header span {
+  color: #c7cfdf;
+  font-size: 0.82rem;
+}
+
+.metric-grid article > span,
+.metric-grid small {
+  color: #abb5c9;
+  font-size: 0.76rem;
+}
+
+.explanation p {
+  color: #b5bed0;
+  font-size: 0.95rem;
+}
+
+.rule-summary span,
+.rule-summary strong {
+  font-size: 0.75rem;
+}
+
+.rule-summary span {
+  color: #aab4c8;
+}
+
+.chart-heading p:not(.section-number) {
+  color: #a7b1c5;
+  font-size: 0.77rem;
+}
+
+.chart-axis,
+.chart-tooltip span {
+  color: #9ea9bf;
+  font-size: 0.7rem;
+}
+
+footer {
+  color: #96a2b9;
+  font-size: 0.75rem;
+}
+
+footer a {
+  color: #b9c3d6;
+}
+
+html[data-theme="light"] header .brand-description,
+html[data-theme="light"] .project-note p,
+html[data-theme="light"] .workflow-intro p,
+html[data-theme="light"] .workflow-steps span,
+html[data-theme="light"] .field-helper,
+html[data-theme="light"] .price-helper,
+html[data-theme="light"] .market-clock > div > span,
+html[data-theme="light"] .security-identity span,
+html[data-theme="light"] .suggestion-list button > small,
+html[data-theme="light"] .market-status small,
+html[data-theme="light"] .metric-grid article > span,
+html[data-theme="light"] .metric-grid small,
+html[data-theme="light"] .explanation p,
+html[data-theme="light"] .rule-summary span,
+html[data-theme="light"] .chart-heading p:not(.section-number),
+html[data-theme="light"] .chart-axis,
+html[data-theme="light"] .chart-tooltip span,
+html[data-theme="light"] footer,
+html[data-theme="light"] footer a {
+  color: #515d74;
+}
+
+html[data-theme="light"] label,
+html[data-theme="light"] .market-clock strong,
+html[data-theme="light"] .theme-toggle,
+html[data-theme="light"] .workflow-steps strong,
+html[data-theme="light"] .security-identity strong,
+html[data-theme="light"] .suggestion-list button > span,
+html[data-theme="light"] .decision-header span {
+  color: #202a41;
+}
+
+html[data-theme="light"] .section-heading > span,
+html[data-theme="light"] .security-tags span {
+  color: #536078;
+}
+
+/* Pure black and white brand system */
+
+html[data-theme="dark"] {
+  color: #f7f7f7;
+  background: #000000;
+}
+
+html[data-theme="dark"] body {
+  background: #000000;
+}
+
+html[data-theme="dark"] .project-note {
+  border-color: #242424;
+}
+
+html[data-theme="dark"] .workflow-guide {
+  border-color: #292929;
+  background: #050505;
+  box-shadow: inset 3px 0 0 #c8a63a;
+}
+
+html[data-theme="dark"] .workflow-steps li {
+  border-color: #2a2a2a;
+  background: #000000;
+}
+
+html[data-theme="dark"] .trade-form,
+html[data-theme="dark"] .results,
+html[data-theme="dark"] .chart-card,
+html[data-theme="dark"] .chart-state {
+  border-color: #292929;
+  background: #050505;
+  box-shadow: none;
+}
+
+html[data-theme="dark"] .decision-header,
+html[data-theme="dark"] .metric-grid,
+html[data-theme="dark"] .rule-summary,
+html[data-theme="dark"] .rule-summary > div + div,
+html[data-theme="dark"] .metric-grid article + article {
+  border-color: #292929;
+}
+
+html[data-theme="dark"] .rule-summary {
+  background: #000000;
+}
+
+html[data-theme="dark"] input {
+  border-color: #343434;
+  color: #ffffff;
+  background: #000000;
+}
+
+html[data-theme="dark"] input:hover {
+  border-color: #555555;
+}
+
+html[data-theme="dark"] input:focus,
+html[data-theme="dark"] .security-search input {
+  border-color: #d6b84a;
+  background: #000000;
+}
+
+html[data-theme="dark"] .money-field input:read-only {
+  border-color: #6d581c;
+  background: #0c0a03;
+}
+
+html[data-theme="dark"] .security-profile {
+  border-color: #2c2c2c;
+  background: #080808;
+}
+
+html[data-theme="dark"] .security-tags span,
+html[data-theme="dark"] .section-heading > span {
+  border-color: #343434;
+  background: #000000;
+}
+
+html[data-theme="dark"] .suggestion-list {
+  border-color: #353535;
+  background: #050505;
+}
+
+html[data-theme="dark"] .suggestion-list button {
+  border-color: #242424;
+}
+
+html[data-theme="dark"] .suggestion-list button:hover,
+html[data-theme="dark"] .suggestion-list button:focus-visible {
+  background: #101010;
+}
+
+html[data-theme="dark"] .market-clock,
+html[data-theme="dark"] .theme-toggle {
+  border-color: #333333;
+  background: #050505;
+}
+
+html[data-theme="dark"] .market-status {
+  border-color: #6d581c;
+  background: #0c0a03;
+}
+
+html[data-theme="dark"] .risk-track {
+  background: #2b2b2b;
+}
+
+html[data-theme="dark"] .chart-grid-line {
+  stroke: #252525;
+}
+
+html[data-theme="dark"] .chart-point {
+  fill: #000000;
+}
+
+html[data-theme="dark"] .chart-tooltip {
+  border-color: #3a3a3a;
+  background: #050505;
+}
+
+html[data-theme="dark"] .pending {
+  color: #d0d0d0;
+  background: #171717;
+}
+
+html[data-theme="light"] {
+  color: #151515;
+  background: #f7f7f5;
+}
+
+html[data-theme="light"] body {
+  background: #f7f7f5;
+}
+
+html[data-theme="light"] header h1,
+html[data-theme="light"] .section-heading h2,
+html[data-theme="light"] .explanation h2,
+html[data-theme="light"] .metric-grid strong,
+html[data-theme="light"] .chart-heading h2,
+html[data-theme="light"] .chart-summary > strong,
+html[data-theme="light"] .results-empty h2,
+html[data-theme="light"] .workflow-intro h2 {
+  color: #0d0d0d;
+}
+
+html[data-theme="light"] .project-note {
+  border-color: #d8d8d4;
+}
+
+html[data-theme="light"] .workflow-guide {
+  border-color: #d7d7d2;
+  background: #ffffff;
+  box-shadow: inset 3px 0 0 #c8a63a;
+}
+
+html[data-theme="light"] .workflow-steps li {
+  border-color: #ddddda;
+  background: #fafaf8;
+}
+
+html[data-theme="light"] .trade-form,
+html[data-theme="light"] .results,
+html[data-theme="light"] .chart-card,
+html[data-theme="light"] .chart-state {
+  border-color: #d8d8d4;
+  background: #ffffff;
+  box-shadow: 0 16px 42px rgb(0 0 0 / 5%);
+}
+
+html[data-theme="light"] .decision-header,
+html[data-theme="light"] .metric-grid,
+html[data-theme="light"] .rule-summary,
+html[data-theme="light"] .rule-summary > div + div,
+html[data-theme="light"] .metric-grid article + article {
+  border-color: #e0e0dc;
+}
+
+html[data-theme="light"] .rule-summary {
+  background: #fafaf8;
+}
+
+html[data-theme="light"] input {
+  border-color: #cfcfca;
+  color: #111111;
+  background: #ffffff;
+}
+
+html[data-theme="light"] input:hover {
+  border-color: #9d9d97;
+}
+
+html[data-theme="light"] input:focus,
+html[data-theme="light"] .security-search input {
+  border-color: #c8a63a;
+  background: #ffffff;
+}
+
+html[data-theme="light"] .money-field input:read-only,
+html[data-theme="light"] .market-status {
+  border-color: #dfcf9a;
+  background: #f5f7ff;
+}
+
+html[data-theme="light"] .security-profile,
+html[data-theme="light"] .workflow-steps li {
+  background: #fafaf8;
+}
+
+html[data-theme="light"] .security-tags span,
+html[data-theme="light"] .section-heading > span {
+  border-color: #d7d7d2;
+  background: #ffffff;
+}
+
+html[data-theme="light"] .suggestion-list {
+  border-color: #d0d0cc;
+  background: #ffffff;
+}
+
+html[data-theme="light"] .suggestion-list button {
+  border-color: #e3e3df;
+}
+
+html[data-theme="light"] .suggestion-list button:hover,
+html[data-theme="light"] .suggestion-list button:focus-visible {
+  background: #f3f3f0;
+}
+
+html[data-theme="light"] .market-clock,
+html[data-theme="light"] .theme-toggle {
+  border-color: #d4d4d0;
+  background: #ffffff;
+}
+
+html[data-theme="light"] .risk-track {
+  background: #deded9;
+}
+
+html[data-theme="light"] .chart-grid-line {
+  stroke: #e2e2de;
+}
+
+html[data-theme="light"] .chart-range {
+  border-color: #d4d4d0;
+  background: #f3f3f0;
+}
+
+html[data-theme="light"] .chart-range button {
+  color: #555550;
+}
+
+html[data-theme="light"] .chart-range button:hover,
+html[data-theme="light"] .chart-range button:focus-visible {
+  color: #111111;
+  background: #e7e7e2;
+}
+
+html[data-theme="light"] .chart-range button.active {
+  color: #ffffff;
+  background: #80610f;
+}
+
+html[data-theme="light"] .pending {
+  color: #555555;
+  background: #eeeeeb;
+}
+
 body,
 .project-note,
 .workflow-guide,
@@ -1273,12 +2229,66 @@ body,
 .chart-state,
 input,
 .market-clock,
-.theme-toggle {
+.theme-toggle,
+.theme-switcher {
   transition:
     color 180ms ease,
     border-color 180ms ease,
     background 180ms ease,
     box-shadow 180ms ease;
+}
+
+.theme-switcher {
+  display: flex;
+  gap: 3px;
+  min-height: 42px;
+  padding: 4px;
+  border: 1px solid #333333;
+  border-radius: 9px;
+  background: #050505;
+}
+
+.theme-switcher button {
+  padding: 0 10px;
+  border: 0;
+  border-radius: 5px;
+  color: #b8b8b3;
+  background: transparent;
+  font: inherit;
+  font-size: 0.69rem;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.theme-switcher button:hover,
+.theme-switcher button:focus-visible {
+  color: #ffffff;
+  background: #171717;
+}
+
+.theme-switcher button.active {
+  color: #090909;
+  background: #e1c45c;
+}
+
+html[data-theme="light"] .theme-switcher {
+  border-color: #d4d4d0;
+  background: #ffffff;
+}
+
+html[data-theme="light"] .theme-switcher button {
+  color: #555550;
+}
+
+html[data-theme="light"] .theme-switcher button:hover,
+html[data-theme="light"] .theme-switcher button:focus-visible {
+  color: #111111;
+  background: #e7e7e2;
+}
+
+html[data-theme="light"] .theme-switcher button.active {
+  color: #ffffff;
+  background: #80610f;
 }
 
 @media (max-width: 900px) {
@@ -1373,8 +2383,12 @@ input,
     justify-items: start;
   }
 
+  .chart-controls {
+    width: 100%;
+    justify-items: start;
+  }
+
   .price-chart {
     height: 210px;
   }
 }
-
