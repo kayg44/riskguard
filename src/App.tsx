@@ -365,7 +365,7 @@ function App() {
   const [shares, setShares] = useState('')
   const [stockPrice, setStockPrice] = useState('')
   const [stopPrice, setStopPrice] = useState('')
-  const [portfolioValue, setPortfolioValue] = useState('100000')
+  const [portfolioValue, setPortfolioValue] = useState('')
 
   const [isLoadingPrice, setIsLoadingPrice] =
     useState(false)
@@ -762,26 +762,20 @@ function App() {
             </div>
           </div>
 
-          <div
-            className="theme-switcher"
-            role="group"
-            aria-label="Color theme"
-          >
-            {(['system', 'light', 'dark'] as ThemePreference[]).map(
-              (option) => (
-                <button
-                  key={option}
-                  type="button"
-                  className={themePreference === option ? 'active' : ''}
-                  aria-pressed={themePreference === option}
-                  onClick={() => setThemePreference(option)}
-                >
-                  {option === 'system'
-                    ? 'System'
-                    : option[0].toUpperCase() + option.slice(1)}
-                </button>
-              ),
-            )}
+          <div className="theme-select-wrap">
+            <select
+              className="theme-select"
+              value={themePreference}
+              onChange={(event) =>
+                setThemePreference(event.target.value as ThemePreference)
+              }
+              aria-label="Color theme"
+              title="Choose color theme"
+            >
+              <option value="system">System</option>
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+            </select>
           </div>
         </div>
       </header>

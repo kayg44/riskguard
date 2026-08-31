@@ -2230,7 +2230,7 @@ body,
 input,
 .market-clock,
 .theme-toggle,
-.theme-switcher {
+.theme-select {
   transition:
     color 180ms ease,
     border-color 180ms ease,
@@ -2238,57 +2238,57 @@ input,
     box-shadow 180ms ease;
 }
 
-.theme-switcher {
-  display: flex;
-  gap: 3px;
-  min-height: 42px;
-  padding: 4px;
-  border: 1px solid #333333;
-  border-radius: 9px;
-  background: #050505;
+.theme-select-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
 }
 
-.theme-switcher button {
-  padding: 0 10px;
-  border: 0;
-  border-radius: 5px;
-  color: #b8b8b3;
-  background: transparent;
+.theme-select {
+  min-height: 42px;
+  padding: 0 34px 0 12px;
+  border: 1px solid #333333;
+  border-radius: 9px;
+  outline: none;
+  color: #e8e8e3;
+  background: #050505;
   font: inherit;
   font-size: 0.69rem;
   font-weight: 750;
   cursor: pointer;
+  color-scheme: dark;
+  transition:
+    color 180ms ease,
+    border-color 180ms ease,
+    background 180ms ease,
+    box-shadow 180ms ease;
 }
 
-.theme-switcher button:hover,
-.theme-switcher button:focus-visible {
-  color: #ffffff;
-  background: #171717;
+.theme-select:hover {
+  border-color: #6f6334;
+  background: #111111;
 }
 
-.theme-switcher button.active {
-  color: #090909;
-  background: #e1c45c;
+.theme-select:focus-visible {
+  border-color: #e1c45c;
+  box-shadow: 0 0 0 3px rgb(225 196 92 / 16%);
 }
 
-html[data-theme="light"] .theme-switcher {
+html[data-theme="light"] .theme-select {
   border-color: #d4d4d0;
+  color: #333330;
   background: #ffffff;
+  color-scheme: light;
 }
 
-html[data-theme="light"] .theme-switcher button {
-  color: #555550;
+html[data-theme="light"] .theme-select:hover {
+  border-color: #a58a2b;
+  background: #f6f6f2;
 }
 
-html[data-theme="light"] .theme-switcher button:hover,
-html[data-theme="light"] .theme-switcher button:focus-visible {
-  color: #111111;
-  background: #e7e7e2;
-}
-
-html[data-theme="light"] .theme-switcher button.active {
-  color: #ffffff;
-  background: #80610f;
+html[data-theme="light"] .theme-select:focus-visible {
+  border-color: #80610f;
+  box-shadow: 0 0 0 3px rgb(128 97 15 / 13%);
 }
 
 @media (max-width: 900px) {
